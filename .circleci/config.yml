@@ -1,0 +1,28 @@
+version: 2.1
+
+orbs:
+  aws-cli: circleci/aws-cli@2.0.3
+
+jobs:
+  myjob1:
+    docker:
+      - image:cimg/base
+    steps:
+      - run: echo "hello world"
+  create_infrastructure:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: create cloud formation stack
+          command: | 
+            aws cloudformation deploy \
+            --template-file template.yml \
+            --stack-name myStack -${CIRCLE_WORKFLOW_ID:0:5} \
+            --region us-east-1 
+Workflows:
+  myWorkflow:
+    jobs:
+      - myjob1
+      - create_infrastructure
